@@ -67,13 +67,6 @@ function openInvitation() {
     }, 800);
 }
 
-function initAll() {
-    initCountdown();
-    initScrollReveal();
-    initGuestbook();
-    initQR();
-    initNav();
-}
 
 // ── COUNTDOWN ────────────────────────────────────────
 function initCountdown() {
@@ -123,15 +116,6 @@ function initScrollReveal() {
     elements.forEach(el => obs.observe(el));
 }
 
-// ── NAV ─────────────────────────────────────────────
-function initNav() {
-    const nav = document.getElementById("nav");
-    if (!nav) return;
-
-    window.addEventListener("scroll", () => {
-        nav.classList.toggle("scrolled", window.scrollY > 60);
-    });
-}
 
 // ── RSVP ────────────────────────────────────────────
 
@@ -300,7 +284,6 @@ function initNav() {
     checkNav(); // jalankan sekali saat load
 }
 
-
 function setBnav(el) {
     document.querySelectorAll('.bnav-item')
         .forEach(i => i.classList.remove('active'));
@@ -317,8 +300,12 @@ function initBnavScroll() {
 
         sections.forEach(id => {
             const el = document.getElementById(id);
-            if (el && window.scrollY >= el.offsetTop - 120) {
-                current = id;
+            if (el) {
+                const top = el.getBoundingClientRect().top;
+
+                if (top <= 150) {
+                    current = id;
+                }
             }
         });
 
