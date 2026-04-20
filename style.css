@@ -1185,6 +1185,27 @@ padding-bottom: 8px;
 }
 }
 
+/* MOBILE COUNTDOWN ADJUST */
+@media (max-width: 768px) {
+
+.countdown-grid {
+gap: 10px;
+}
+
+.cd-box {
+padding: 10px 8px;
+min-width: 60px;
+}
+
+.cd-num {
+font-size: 1.2rem;
+}
+
+.cd-label {
+font-size: 0.65rem;
+}
+}
+
 
 /* ITEM */
 .bnav-item {
@@ -1235,5 +1256,19 @@ color: var(--gold);
 opacity: 0;
 visibility: hidden;
 pointer-events: none;
+}
+}
+
+/* footer mobile */
+@media (max-width: 768px) {
+
+.footer-names {
+white-space: nowrap;
+font-size: 0.95rem; /* kecilin biar muat */
+text-align: center;
+}
+
+.footer-ampersand {
+margin: 0 6px;
 }
 }
