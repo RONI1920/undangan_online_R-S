@@ -118,14 +118,33 @@ font-family: 'Cormorant Garamond', serif;
 font-size: clamp(3rem, 10vw, 5.5rem);
 font-weight: 300; font-style: italic;
 color: var(--white); line-height: 1;
-text-shadow: 0 4px 40px rgba(201,169,110,0.25);
+text-shadow: 0 4px 40px rgba(201,169,110,0.25); 
 margin-bottom: 0.3rem;
+white-space: nowrap; /* Mencegah nama turun ke baris baru */
+width: 100%;
+text-align: center;
 }
 .cover-ampersand {
 font-family: 'Dancing Script', cursive;
 font-size: clamp(2rem, 7vw, 3.5rem);
 color: var(--gold); display: block; margin: 0.2rem 0;
 }
+
+.hero-family {
+margin-top: 1rem;
+font-size: 1rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(--gold-light);
+opacity: 0.7;
+line-height: 1.6;
+font-family: 'Cormorant Garamond', serif !important;
+}
+
+.hero-family p {
+margin: 0.2rem 0;
+}
+
 .cover-date {
 font-family: 'Jost', sans-serif;
 font-size: 0.8rem; letter-spacing: 0.25em;
@@ -248,7 +267,7 @@ text-align: center; padding: 4rem 2rem;
 animation: fadeUp 0.8s ease both;
 }
 .hero-tag {
-font-size: 0.65rem; letter-spacing: 0.5em;
+font-size: 1rem; letter-spacing: 0.5em;
 color: var(--gold); text-transform: uppercase;
 margin-bottom: 1.5rem; opacity: 0.7;
 }
@@ -576,6 +595,19 @@ font-family: 'Cormorant Garamond', serif;
 font-size: 1.5rem; color: var(--gold);
 }
 
+
+.rsvp-success {
+opacity: 0;
+transform: translateY(20px);
+transition: 0.4s;
+}
+
+.rsvp-success.show {
+display: block;
+opacity: 1;
+transform: translateY(0);
+}
+
 /* ════════════════════════════════════════
 GUESTBOOK
 (FIX: --text & --text-light kini terdefinisi)
@@ -843,17 +875,45 @@ text-transform: uppercase;
 MUSIC BUTTON
 ════════════════════════════════════════ */
 #music-btn {
-position: fixed; bottom: 2rem; right: 2rem; z-index: 500;
-width: 48px; height: 48px;
-background: rgba(26,18,8,0.9);
-border: 1px solid rgba(201,169,110,0.4);
-color: var(--gold); cursor: pointer;
-display: flex; align-items: center; justify-content: center;
-backdrop-filter: blur(10px); transition: all 0.3s ease;
+position: fixed;
+bottom: 20px;
+right: 20px;
+width: 50px;
+height: 50px;
 border-radius: 50%;
+background: rgba(26, 18, 8, 0.8); /* Warna gelap transparan */
+border: 1px solid var(--gold);
+color: var(--gold);
+cursor: pointer;
+z-index: 9999;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 0; /* Pastikan tidak ada padding yang bikin ikon geser */
 }
+
+
 #music-btn:hover { background: rgba(201,169,110,0.2); }
-#music-btn svg { width: 18px; height: 18px; }
+#music-btn svg {
+width: 24px;
+height: 24px;
+position: absolute; /* Membuat ikon bertumpuk di titik yang sama */
+}
+
+/* Sembunyikan ikon pause secara default */
+#music-icon-pause {
+display: none;
+}
+
+/* Jika tombol diklik (state playing), atur tampilan ikonnya */
+#music-btn.playing #music-icon-play {
+display: none;
+}
+
+#music-btn.playing #music-icon-pause {
+display: block;
+}
+
 #music-btn.playing { animation: pulse-ring 2s infinite; }
 @keyframes pulse-ring {
 0%   { box-shadow: 0 0 0 0   rgba(201,169,110,0.4); }

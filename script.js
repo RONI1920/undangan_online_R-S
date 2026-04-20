@@ -3,7 +3,7 @@ const CONFIG = {
     bride: "Rudi Putra",
     groom: "Fulan",
     eventName: "Pernikahan",
-    eventDate: new Date("2026-05-20T00:00:00")
+    eventDate: new Date("2026-05-02T00:00:00")
 };
 
 // ── GLOBAL STATE ─────────────────────────────────────
@@ -134,14 +134,48 @@ function initNav() {
 }
 
 // ── RSVP ────────────────────────────────────────────
-function submitRSVP(e) {
+
+const SUPABASE_URL = "https://nkbqjdmiwmfbejbqsdyl.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rYnFqZG1pd21mYmVqYnFzZHlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMTAxMzUsImV4cCI6MjA5MTU4NjEzNX0.-58DEvE2wD3Y1NJbqIBI0qjCZ51gKRZpcemkkvevrgo";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function submitRSVP(e) {
     e.preventDefault();
 
     const form = document.getElementById("rsvp-form");
     const success = document.getElementById("rsvp-success");
 
-    if (form) form.style.display = "none";
-    if (success) success.classList.add("show");
+    // ambil data dari form
+    const nama = form.querySelector('input[type="text"]').value;
+    const no_hp = form.querySelector('input[type="tel"]').value;
+
+    const hadir = form.querySelector('input[name="hadir"]:checked').value;
+    const jumlah = document.getElementById("guest-count").value;
+
+    try {
+        const { error } = await supabaseClient
+            .from("rsvp")
+            .insert([{
+                nama: nama,
+                no_hp: no_hp,
+                kehadiran: hadir,
+                jumlah_tamu: parseInt(jumlah)
+            }]);
+
+        if (error) throw error;
+
+        // UI tetap sama seperti sekarang
+        if (form) form.style.display = "none";
+        if (success) {
+            success.style.display = "block"; // 🔥 ini kuncinya
+            success.classList.add("show");
+        }
+
+    } catch (err) {
+        console.error("RSVP ERROR:", err);
+        alert("Gagal mengirim RSVP 😢");
+    }
 }
 
 // ── GUESTBOOK ───────────────────────────────────────
