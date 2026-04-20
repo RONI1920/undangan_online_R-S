@@ -1070,3 +1070,79 @@ margin-bottom: 1.5rem;
 #countdown {
     padding: 0; /* biarkan section-inner yang atur spacing */
 }
+
+/* ════════════════════════════════════════
+BOTTOM NAV (mobile only)
+════════════════════════════════════════ */
+.bottom-nav-mobile {
+display: none;
+}
+.bottom-nav-mobile {
+display: flex;
+position: fixed;
+bottom: 0; left: 0; right: 0;
+height: 68px;
+background: var(--dark);
+border-top: 1px solid rgba(201,169,110,0.15);
+z-index: 200;
+align-items: flex-end;
+justify-content: space-around;
+padding: 0 4px 10px;
+}
+
+/* beri ruang agar konten tidak ketutup navbar */
+#main { padding-bottom: 68px; }
+
+.bnav-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+flex: 1;
+cursor: pointer;
+position: relative;
+text-decoration: none;
+-webkit-tap-highlight-color: transparent;
+}
+
+.bnav-icon {
+width: 40px; height: 40px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+background: transparent;
+transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bnav-icon svg {
+width: 20px; height: 20px;
+stroke: rgba(201,169,110,0.45);
+fill: none;
+stroke-width: 1.5;
+transition: stroke 0.3s ease;
+}
+
+.bnav-label {
+font-size: 9px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: rgba(201,169,110,0.4);
+font-family: 'Jost', sans-serif;
+transition: color 0.3s ease, margin-top 0.35s ease;
+}
+
+/* STATE AKTIF */
+.bnav-item.active .bnav-icon {
+background: var(--gold);
+transform: translateY(-16px);
+}
+
+.bnav-item.active .bnav-icon svg {
+stroke: var(--dark);
+}
+
+.bnav-item.active .bnav-label {
+color: var(--gold);
+margin-top: 18px;
+}

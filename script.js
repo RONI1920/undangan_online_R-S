@@ -299,3 +299,41 @@ function initNav() {
     window.addEventListener("scroll", checkNav);
     checkNav(); // jalankan sekali saat load
 }
+
+
+function setBnav(el) {
+    document.querySelectorAll('.bnav-item')
+        .forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+}
+
+// Auto-highlight saat scroll
+function initBnavScroll() {
+    const sections = ['hero', 'countdown', 'events', 'rsvp', 'guestbook'];
+    const items = document.querySelectorAll('.bnav-item');
+
+    window.addEventListener('scroll', () => {
+        let current = 'hero';
+
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && window.scrollY >= el.offsetTop - 120) {
+                current = id;
+            }
+        });
+
+        items.forEach(item => {
+            const href = item.getAttribute('href').replace('#', '');
+            item.classList.toggle('active', href === current);
+        });
+    });
+}
+
+function initAll() {
+    initCountdown();
+    initScrollReveal();
+    initGuestbook();
+    initQR();
+    initNav();
+    initBnavScroll(); // ← tambah ini
+}
