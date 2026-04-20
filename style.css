@@ -1272,3 +1272,25 @@ text-align: center;
 margin: 0 6px;
 }
 }
+
+/*  */
+@media (max-width: 768px) {
+#music-btn {
+position: fixed;
+bottom: 80px;
+right: 20px;
+z-index: 99999;
+
+opacity: 0;
+visibility: hidden;
+pointer-events: none;
+
+transition: 0.4s ease;
+}
+}
+
+#music-btn.show {
+opacity: 1;
+visibility: visible;
+pointer-events: auto;
+}

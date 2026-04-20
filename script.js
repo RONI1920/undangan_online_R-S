@@ -57,9 +57,16 @@ function initParticles() {
 function openInvitation() {
     const cover = document.getElementById("cover");
     const main = document.getElementById("main");
+    const musicBtn = document.getElementById("music-btn");
 
     if (cover) cover.classList.add("hidden");
     if (main) main.classList.add("visible");
+
+    setTimeout(() => {
+        if (musicBtn) {
+            musicBtn.classList.add("show"); // 🔥 ini kuncinya
+        }
+    }, 800);
 
     setTimeout(() => {
         if (cover) cover.style.display = "none";
@@ -324,3 +331,4 @@ function initAll() {
     initNav();
     initBnavScroll(); // ← tambah ini
 }
+
