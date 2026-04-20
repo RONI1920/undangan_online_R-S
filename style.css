@@ -131,13 +131,13 @@ color: var(--gold); display: block; margin: 0.2rem 0;
 }
 
 .hero-family {
-margin-top: 1rem;
-font-size: 1rem;
+margin-top: 0.4rem; /* dari 1rem jadi lebih rapat */
+font-size: 0.8rem;  /* dari 1rem jadi lebih kecil */
 letter-spacing: 0.15em;
 text-transform: uppercase;
 color: var(--gold-light);
 opacity: 0.7;
-line-height: 1.6;
+line-height: 1.5;
 font-family: 'Cormorant Garamond', serif !important;
 }
 
@@ -182,13 +182,14 @@ transition: transform 0.4s ease;
 
 
 
-#main {
+#main { 
 opacity: 0;
 visibility: hidden;
 transition: 0.5s;
+background: var(--cream);
 }
 
-#main.visible {
+#main.visible { 
 opacity: 1;
 visibility: visible;
 }
@@ -244,13 +245,23 @@ line-height: 1.2; margin-bottom: 1.5rem;
 HERO
 ════════════════════════════════════════ */
 #hero {
-
-
-
 min-height: 100svh;
-display: flex; align-items: center; justify-content: center;
+display: flex;
+align-items: center;
+justify-content: center;
 text-align: center;
+padding: 0;
+position: relative;  /* pastikan ini ada */
 }
+
+#hero .cover-bg,
+#hero .hero-bg {
+position: absolute;
+inset: 0;
+z-index: 0;
+}
+
+
 .hero-bg {
 position: absolute; inset: 0;
 background:
@@ -260,38 +271,65 @@ background-size: cover;
 filter: grayscale(20%) brightness(0.6);
 }
 
-
 .hero-inner {
-position: relative; z-index: 1;
-text-align: center; padding: 4rem 2rem;
+position: relative;
+z-index: 2;           /* harus lebih tinggi dari bg */
+text-align: center;
+padding: 5rem 2rem;
 animation: fadeUp 0.8s ease both;
+width: 100%;
+max-width: 760px;
 }
+
+
 .hero-tag {
-font-size: 1rem; letter-spacing: 0.5em;
-color: var(--gold); text-transform: uppercase;
-margin-bottom: 1.5rem; opacity: 0.7;
+font-size: 0.75rem; /* dari 1rem jadi lebih kecil */
+letter-spacing: 0.4em;
+color: var(--gold);
+text-transform: uppercase;
+margin-bottom: 1rem; /* d       ari 1.5rem */
+opacity: 0.7;
 }
+
+
 .hero-names {
 font-family: 'Cormorant Garamond', serif;
-font-size: clamp(3.5rem, 12vw, 7rem);
-font-weight: 300; font-style: italic;
-color: var(--white); line-height: 0.95;
+font-size: clamp(2.5rem, 8vw, 5rem); /* dari 7rem jadi 5rem */
+font-weight: 300;
+font-style: italic;
+color: var(--white);
+line-height: 1.1; /* dari 0.95 naik sedikit */
 }
+
 .hero-amp {
 font-family: 'Dancing Script', cursive;
-font-size: clamp(2.5rem, 8vw, 4rem);
-color: var(--gold); display: block; margin: 0.5rem 0;
+font-size: clamp(1.8rem, 5vw, 3rem); /* dari 4rem jadi 3rem */
+color: var(--gold);
+display: block;
+margin: 0.2rem 0; /* dari 0.5rem jadi 0.2rem */
 }
+
 .hero-date-row {
-display: flex; align-items: center; justify-content: center;
-gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 1rem;  /* dari 1.5rem */
+margin-top: 1.2rem; /* dari 2rem */
+flex-wrap: wrap;
 }
+
+
 .hero-date-item { text-align: center; }
+
+
 .hero-date-num {
 font-family: 'Cormorant Garamond', serif;
-font-size: 2.5rem; font-weight: 300;
-color: var(--gold); line-height: 1;
+font-size: 2rem; /* dari 2.5rem */
+font-weight: 300;
+color: var(--gold);
+line-height: 1;
 }
+
 .hero-date-label {
 font-size: 0.6rem; letter-spacing: 0.3em;
 color: var(--gold-light); text-transform: uppercase; opacity: 0.6;
@@ -299,14 +337,24 @@ color: var(--gold-light); text-transform: uppercase; opacity: 0.6;
 .hero-sep { color: var(--gold); opacity: 0.3; font-size: 2rem; }
 
 .scroll-hint {
-position: absolute; bottom: 2rem; left: 50%;
+position: absolute;
+bottom: 2rem;
+left: 50%;
 transform: translateX(-50%);
-display: flex; flex-direction: column;
-align-items: center; gap: 0.5rem;
-color: var(--gold); opacity: 0.5;
+z-index: 2;           /* sama dengan hero-inner */
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.5rem;
+color: var(--gold);
+opacity: 0.5;
 animation: bounce 2s infinite;
-font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+font-size: 0.6rem;
+letter-spacing: 0.2em;
+text-transform: uppercase;
 }
+
+
 .scroll-hint svg { width: 16px; height: 16px; }
 @keyframes bounce {
 0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -351,11 +399,14 @@ border-color: var(--gold); border-style: solid; opacity: 0.5;
 /* ════════════════════════════════════════
 EVENTS
 ════════════════════════════════════════ */
-#events { 
-/* Samakan dengan background countdown agar mengalir */
+#events {
 background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)); 
 position: relative;
-padding: 80px 0;
+padding: 20px 0 60px; /* atas kecil, bawah tetap ada ruang */
+}
+
+#events .section-inner {
+    padding: 2rem 2rem 4rem; /* override khusus, tidak ganggu section lain */
 }
 
 .event-cards {
@@ -927,11 +978,22 @@ NAVIGATION
 (FIX: .nav-logo & .nav-links lengkap)
 ════════════════════════════════════════ */
 nav {
-position: fixed; top: 0; width: 100%; z-index: 100;
+position: fixed;
+top: 0;
+width: 100%;
+z-index: 100;
 padding: 1.5rem 2rem;
-display: flex; justify-content: space-between; align-items: center;
-transition: var(--transition);
+display: flex;
+justify-content: space-between;
+align-items: center;
+transition: opacity 0.4s ease, transform 0.4s ease, padding 0.4s ease, background 0.4s ease;
+/* Tambahan: sembunyikan di awal */
+opacity: 0;
+pointer-events: none;
+transform: translateY(-100%);
 }
+
+
 nav.scrolled {
 background: var(--dark-glass);
 padding: 1rem 2rem;
@@ -991,4 +1053,20 @@ border: 1px solid rgba(201,169,110,0.3);
 font-size: 0.65rem; letter-spacing: 0.2em;
 color: var(--gold); text-transform: uppercase;
 margin-bottom: 1.5rem;
+}
+
+/* Samakan padding semua section-inner dengan RSVP */
+#events .section-inner,
+#guestbook .section-inner,
+#amplop .section-inner,
+#countdown .countdown-inner {
+    padding: 5rem 2rem; /* sama persis dengan .section-inner default milik RSVP */
+}
+
+/* Kurangi padding atas section itu sendiri */
+#events,
+#guestbook,
+#amplop,
+#countdown {
+    padding: 0; /* biarkan section-inner yang atur spacing */
 }

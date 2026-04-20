@@ -273,3 +273,29 @@ function downloadQR() {
     link.href = canvas.toDataURL();
     link.click();
 }
+
+function initNav() {
+    const nav = document.getElementById("nav");
+    const hero = document.getElementById("hero");
+    if (!nav || !hero) return;
+
+    function checkNav() {
+        const heroBottom = hero.getBoundingClientRect().bottom;
+
+        if (heroBottom > 0) {
+            // Masih di hero section — sembunyikan navbar
+            nav.style.opacity = "0";
+            nav.style.pointerEvents = "none";
+            nav.style.transform = "translateY(-100%)";
+        } else {
+            // Sudah lewat hero — tampilkan navbar
+            nav.style.opacity = "1";
+            nav.style.pointerEvents = "auto";
+            nav.style.transform = "translateY(0)";
+            nav.classList.add("scrolled");
+        }
+    }
+
+    window.addEventListener("scroll", checkNav);
+    checkNav(); // jalankan sekali saat load
+}
