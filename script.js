@@ -193,18 +193,135 @@ function renderMessages() {
     `).join("");
 }
 
-function submitGuestbook(e) {
+// ── SUPABASE INIT ──
+const SUPABASE_URL_GB = "https://cykktrwcbtkcbvgqshiw.supabase.co";
+const SUPABASE_KEY_GB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5a2t0cndjYnRrY2J2Z3FzaGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODE0NTMsImV4cCI6MjA5MjI1NzQ1M30.ejk0OoR3_fTKF8Lyn86sxklmWyoRkDdGfqP84LUrjwA";
+
+const supabaseGuestbook = supabase.createClient(
+    SUPABASE_URL_GB,
+    SUPABASE_KEY_GB
+);
+
+let isLoadingGuestbook = false;
+
+// ── ESCAPE HTML ──
+function escapeHTML(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    }[tag]));
+}
+
+// ── TIME FORMAT ──
+function timeAgo(date) {
+    const d = new Date(date);
+    if (isNaN(d)) return "";
+
+    const seconds = Math.floor((new Date() - d) / 1000);
+
+    const intervals = {
+        tahun: 31536000,
+        bulan: 2592000,
+        hari: 86400,
+        jam: 3600,
+        menit: 60
+    };
+
+    for (let key in intervals) {
+        const interval = Math.floor(seconds / intervals[key]);
+        if (interval > 0) return `${interval} ${key} lalu`;
+    }
+
+    return "Baru saja";
+}
+
+// ── LOAD ──
+async function loadGuestbook() {
+    if (isLoadingGuestbook) return;
+    isLoadingGuestbook = true;
+
+    const track = document.getElementById("gb-track");
+    if (!track) return;
+
+    track.innerHTML = "Memuat ucapan...";
+
+    const { data, error } = await supabaseGuestbook
+        .from("guestbook")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+    isLoadingGuestbook = false;
+
+    if (error) {
+        track.innerHTML = "<p>Gagal memuat ucapan.</p>";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        track.innerHTML = "<p>Belum ada ucapan 💌</p>";
+        return;
+    }
+
+    track.innerHTML = data.map(item => `
+        <div class="gb-message">
+            <div class="gb-message-header">
+                <span class="gb-name">${escapeHTML(item.nama)}</span>
+                <span class="gb-time">${timeAgo(item.created_at)}</span>
+            </div>
+            <p class="gb-text">${escapeHTML(item.pesan)}</p>
+        </div>
+    `).join("");
+}
+
+// ── SUBMIT ──
+async function submitGuestbook(e) {
     e.preventDefault();
 
-    const name = document.getElementById("gb-name").value.trim();
-    const msg = document.getElementById("gb-msg").value.trim();
+    const nameInput = document.getElementById("gb-name");
+    const msgInput = document.getElementById("gb-msg");
 
-    if (!name || !msg) return;
+    const nama = nameInput.value.trim();
+    const pesan = msgInput.value.trim();
 
-    messages.unshift({ name, msg, time: "Baru saja" });
-    renderMessages();
-    e.target.reset();
+    if (!nama || !pesan) {
+        alert("Nama dan pesan wajib diisi!");
+        return;
+    }
+
+    const { error } = await supabaseGuestbook
+        .from("guestbook")
+        .insert([{ nama, pesan }]);
+
+    if (error) {
+        alert("Gagal mengirim pesan ❌");
+        return;
+    }
+
+    nameInput.value = "";
+    msgInput.value = "";
+
+    await loadGuestbook();
+    alert("Ucapan berhasil dikirim 💌");
 }
+
+// ── REALTIME ──
+const guestbookChannel = supabaseGuestbook
+    .channel('guestbook')
+    .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'guestbook'
+    }, () => {
+        loadGuestbook();
+    })
+    .subscribe();
+
+// ── INIT ──
+document.addEventListener("DOMContentLoaded", () => {
+    loadGuestbook();
+});
+
 
 // ── MUSIC ───────────────────────────────────────────
 function initMusic() {
