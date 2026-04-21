@@ -235,7 +235,8 @@ function timeAgo(date) {
     return "Baru saja";
 }
 
-// ── LOAD ──
+// ── LOAD GUESTBOOK + RENDER SLIDER ──────────────────
+// ── LOAD GUESTBOOK + RENDER SLIDER ──────────────────
 async function loadGuestbook() {
     if (isLoadingGuestbook) return;
     isLoadingGuestbook = true;
@@ -243,35 +244,39 @@ async function loadGuestbook() {
     const track = document.getElementById("gb-track");
     if (!track) return;
 
-    track.innerHTML = "Memuat ucapan...";
+    track.innerHTML = '<div class="review-loading">Memuat ucapan... 💌</div>';
 
     const { data, error } = await supabaseGuestbook
         .from("guestbook")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(30);
 
     isLoadingGuestbook = false;
 
-    if (error) {
-        track.innerHTML = "<p>Gagal memuat ucapan.</p>";
+    if (error || !data || data.length === 0) {
+        track.innerHTML = '<div class="review-loading">Belum ada ucapan 💌</div>';
         return;
     }
 
-    if (!data || data.length === 0) {
-        track.innerHTML = "<p>Belum ada ucapan 💌</p>";
-        return;
-    }
+    // duplikat data biar slider terasa infinite loop
+    const doubled = [...data, ...data];
 
-    track.innerHTML = data.map(item => `
-        <div class="gb-message">
-            <div class="gb-message-header">
-                <span class="gb-name">${escapeHTML(item.nama)}</span>
-                <span class="gb-time">${timeAgo(item.created_at)}</span>
-            </div>
-            <p class="gb-text">${escapeHTML(item.pesan)}</p>
-        </div>
-    `).join("");
+    track.innerHTML = doubled.map(item => `
+    <div class="gb-message">
+      <div class="gb-message-header">
+        <span class="gb-name">${escapeHTML(item.nama)}</span>
+        <span class="gb-time">${timeAgo(item.created_at)}</span>
+      </div>
+      <p class="gb-text">${escapeHTML(item.pesan)}</p>
+      <div class="gb-star">✦ ✦ ✦</div>
+    </div>
+  `).join("");
+
+    // sesuaikan durasi animasi berdasarkan jumlah kartu
+    // makin banyak kartu makin lambat biar enak dibaca
+    const duration = Math.max(20, data.length * 4);
+    track.style.animationDuration = `${duration}s`;
 }
 
 // ── SUBMIT ──

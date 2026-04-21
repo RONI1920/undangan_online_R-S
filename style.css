@@ -67,16 +67,15 @@ filter: grayscale(20%) brightness(0.6);
 position: absolute; inset: 0;
 background:
 linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-url('image/gambar_1.jpg') no-repeat center;
+url('image/cover1.jpg') no-repeat center;
 background-size: cover;
 filter: grayscale(20%) brightness(0.6);
 }
 
 .cover-bg2 {
 position: absolute; inset: 0;
-background:
-linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-url('image/Gambar_2.png') no-repeat center;
+background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+url('image/cover2.jpeg') no-repeat center;
 background-size: cover;
 filter: grayscale(20%) brightness(0.6);
 }
@@ -659,94 +658,173 @@ opacity: 1;
 transform: translateY(0);
 }
 
-/* ════════════════════════════════════════
-GUESTBOOK
-(FIX: --text & --text-light kini terdefinisi)
-════════════════════════════════════════ */
 
 /* ════════════════════════════════════════
 GUESTBOOK SECTION
 ════════════════════════════════════════ */
 #guestbook {
-position: relative;
-padding: 100px 0;
-overflow: hidden;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
 }
 
-/* Background menggunakan cover-bg3 dengan filter konsisten */
-.cover-bg3 {
-position: absolute; inset: 0;
-background:
-linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-url('image/cover3.jpg') no-repeat center;
-background-size: cover;
-background-attachment: fixed;
-filter: grayscale(20%) brightness(0.5);
-z-index: 0;
+
+#guestbook .section-inner {
+  padding: 5rem 2rem 4rem;
+  position: relative;
+  z-index: 2;
 }
 
-/* Form Guestbook (Samakan dengan rsvp-form) */
-.gb-form {
-margin-top: 3rem;
-display: grid;
-gap: 1.5rem;
-background: rgba(255, 255, 255, 0.03);
-backdrop-filter: blur(15px);
--webkit-backdrop-filter: blur(15px);
-padding: 2.5rem;
-border: 1px solid rgba(201,169,110,0.2);
-position: relative;
-z-index: 2;
+/* ── FORM ── */
+.gb-form-inner {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,169,110,0.2);
+  padding: 2rem 2.5rem;
+  margin-top: 2rem;
 }
 
-/* List Pesan yang Masuk */
-.gb-messages {
-margin-top: 3rem;
-max-height: 500px;
-overflow-y: auto;
-display: grid;
-gap: 1rem;
-padding-right: 10px; /* Spasi untuk scrollbar */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-/* Desain Kartu Pesan Individual */
-.gb-msg-item {
-background: rgba(255, 255, 255, 0.05);
-backdrop-filter: blur(8px);
-border: 1px solid rgba(255, 255, 255, 0.1);
-padding: 1.5rem;
-border-radius: 4px;
-transition: 0.3s;
+.form-grid .form-row.full {
+  grid-column: 1 / -1;
 }
 
-.gb-msg-item:hover {
-border-color: var(--gold);
-background: rgba(255, 255, 255, 0.08);
+@media (max-width: 500px) {
+  .form-grid { grid-template-columns: 1fr; }
 }
 
-.gb-msg-name {
-font-family: 'Cormorant Garamond', serif;
-font-size: 1.2rem;
-color: var(--gold);
-font-weight: 500;
-margin-bottom: 0.5rem;
-display: block;
+/* ── SLIDER OUTER ── */
+.slider-outer {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 0.5rem 0 1.5rem;
+  margin-top: 3rem;
+  z-index: 2;
 }
 
-.gb-msg-text {
-font-size: 0.9rem;
-color: rgba(255, 255, 255, 0.8);
-line-height: 1.6;
-font-style: italic;
+.slider-outer::before,
+.slider-outer::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 3;
+  pointer-events: none;
 }
 
-/* Custom Scrollbar agar tetap cantik */
-.gb-messages::-webkit-scrollbar {
-width: 4px;
+.slider-outer::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.7) 30%, transparent);
 }
-.gb-messages::-webkit-scrollbar-thumb {
-background: var(--gold);
-border-radius: 10px;
+
+.slider-outer::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,0.7) 30%, transparent);
+}
+
+.slider-track {
+  display: flex;
+  gap: 1.2rem;
+  width: max-content;
+  padding: 0.8rem 1.5rem;
+  animation: scrollLeft 32s linear infinite;
+}
+
+.slider-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scrollLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── KARTU UCAPAN ── */
+.msg-card {
+  background: rgba(201,169,110,0.08);
+  border: 1px solid rgba(201,169,110,0.35);
+  border-top: 2px solid rgba(201,169,110,0.5);
+  padding: 1.5rem 1.6rem 1.2rem;
+  min-width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.35s ease;
+}
+
+.msg-card:hover {
+  background: rgba(201,169,110,0.14);
+  border-color: rgba(201,169,110,0.7);
+  transform: translateY(-4px);
+}
+
+.quote-dec {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  color: #c9a96e;
+  opacity: 0.2;
+  position: absolute;
+  top: -0.8rem;
+  left: 0.8rem;
+  line-height: 1;
+  pointer-events: none;
+  font-style: italic;
+}
+
+.msg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.9rem;
+  gap: 0.5rem;
+}
+
+.msg-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  color: #e8d5b0;
+  font-weight: 400;
+}
+
+.msg-time {
+  font-size: 0.6rem;
+  color: rgba(201,169,110,0.45);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.msg-text {
+  font-size: 0.83rem;
+  color: rgba(255,253,248,0.75);
+  line-height: 1.75;
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.msg-stars {
+  margin-top: 1rem;
+  color: #c9a96e;
+  font-size: 0.6rem;
+  opacity: 0.5;
+  letter-spacing: 0.35em;
+}
+
+.gb-count {
+  text-align: center;
+  font-size: 0.65rem;
+  color: rgba(201,169,110,0.4);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 2;
 }
 
 /* ════════════════════════════════════════
@@ -995,11 +1073,13 @@ transform: translateY(-100%);
 
 
 nav.scrolled {
-background: var(--dark-glass);
+background: rgba(255, 182, 193, 0.12); /* light pink transparan */
 padding: 1rem 2rem;
 backdrop-filter: blur(10px);
-border-bottom: 1px solid rgba(201,169,110,0.2);
-}
+border-bottom: 1px solid rgba(255, 182, 193, 0.25); }
+
+
+
 .nav-logo {
 font-family: 'Dancing Script', cursive; /* FIX: sebelumnya tidak ada */
 font-size: 1.5rem; color: var(--gold);
@@ -1065,12 +1145,18 @@ margin-bottom: 1.5rem;
 
 /* Kurangi padding atas section itu sendiri */
 #events,
-#guestbook,
-#amplop,
-#countdown {
-    padding: 0; /* biarkan section-inner yang atur spacing */
+#guestbook {
+position: relative;
 }
 
+.cover-bg2 {
+z-index: 0;
+}
+
+.section-inner {
+position: relative;
+z-index: 2;
+}
 
 /* ════════════════════════════════════════
 BOTTOM NAV (mobile only)
@@ -1264,14 +1350,14 @@ pointer-events: none;
 
 .footer-names {
 white-space: nowrap;
-font-size: 0.95rem; /* kecilin biar muat */
 text-align: center;
+}
 }
 
 .footer-ampersand {
 margin: 0 6px;
 }
-}
+
 
 /*  */
 @media (max-width: 768px) {
@@ -1293,4 +1379,133 @@ transition: 0.4s ease;
 opacity: 1;
 visibility: visible;
 pointer-events: auto;
+}
+/* ════════════════════════════════════════
+REVIEW SLIDER GUESTBOOK
+════════════════════════════════════════ */
+.review-slider-outer {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* fade kiri kanan biar kesan infinite */
+.review-slider-outer::before,
+.review-slider-outer::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 60px;
+  z-index: 3;
+  pointer-events: none;
+}
+.review-slider-outer::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(26,18,8,0.9), transparent);
+}
+.review-slider-outer::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(26,18,8,0.9), transparent);
+}
+
+.review-slider-wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
+.review-slider-track {
+  display: flex;
+  gap: 1.2rem;
+  width: max-content;
+  animation: slideLeft 30s linear infinite;
+  padding: 1rem 0.5rem;
+}
+
+.review-slider-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes slideLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* KARTU UCAPAN */
+.gb-message {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,169,110,0.2);
+  padding: 1.5rem 1.8rem;
+  min-width: 260px;
+  max-width: 280px;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.3s ease;
+}
+
+.gb-message:hover {
+  border-color: var(--gold);
+}
+
+/* tanda kutip dekoratif */
+.gb-message::before {
+  content: '\201C';
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  color: var(--gold);
+  opacity: 0.15;
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  line-height: 1;
+}
+
+.gb-message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+  gap: 0.5rem;
+}
+
+.gb-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-weight: 400;
+  display: block;
+}
+
+.gb-time {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+.gb-text {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* ornamen bintang bawah */
+.gb-star {
+  margin-top: 1rem;
+  color: var(--gold);
+  font-size: 0.7rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+
+/* loading & empty state */
+.review-loading {
+  color: rgba(255,255,255,0.3);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  padding: 2rem;
+  font-style: italic;
 }

@@ -48,11 +48,6 @@
 
     <div class="bottom-nav-mobile">
 
-      <a href="#hero" class="bnav-item active" onclick="setBnav(this)">
-        <div class="bnav-icon">🏠</div>
-        <span class="bnav-label">Home</span>
-      </a>
-
       <a href="#countdown" class="bnav-item" onclick="setBnav(this)">
         <div class="bnav-icon">📅</div>
         <span class="bnav-label">Date</span>
@@ -63,9 +58,14 @@
         <span class="bnav-label">Acara</span>
       </a>
 
+      <a href="#hero" class="bnav-item active" onclick="setBnav(this)">
+        <div class="bnav-icon">🏠</div>
+        <span class="bnav-label">Home</span>
+      </a>
+
 
       <a href="#rsvp" class="bnav-item" onclick="setBnav(this)">
-        <div class="bnav-icon">✅</div>
+        <div class="bnav-icon">📖</div>
         <span class="bnav-label">RSVP</span>
       </a>
 
@@ -92,7 +92,6 @@
     <!-- HERO -->
     <section id="hero">
       <div class="cover-bg"></div>
-      <div class="hero-bg"></div>
       <div class="hero-inner">
         <div class="hero-tag">Dengan Memohon Rahmat Allah SWT</div>
         <h1 class="hero-names">
@@ -328,13 +327,12 @@
           <button type="submit" class="btn-submit" style="background:var(--gold-dark);color:var(--white);">Kirim Ucapan
             💌</button>
         </form>
+
+        <!-- slider Doa -->
         <div class="review-slider-outer">
           <div class="review-slider-wrapper">
             <div class="review-slider-track" id="gb-track">
-              <div class="review-loading"
-                style="color:rgba(255,255,255,0.4);text-align:center;padding:2rem;font-size:0.85rem;">
-                Memuat ucapan...
-              </div>
+              <div class="review-loading">Memuat ucapan... 💌</div>
             </div>
           </div>
         </div>
