@@ -75,7 +75,7 @@ filter: grayscale(20%) brightness(0.6);
 .cover-bg2 {
 position: absolute; inset: 0;
 background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-url('image/cover2.jpeg') no-repeat center;
+url('image/cover2.jpegs') no-repeat center;
 background-size: cover;
 filter: grayscale(20%) brightness(0.6);
 }
