@@ -451,28 +451,38 @@ function initAll() {
     initGuestbook();
     initQR();
     initNav();
-    initBnavScroll(); // ← tambah ini
+    initBnavScroll();
 }
-//  footer nav
-const nav = document.querySelector('nav');
-const closing = document.querySelector('#closing');
-const footer = document.querySelector('.footer-dev');
+
+
+//  footer navconst bottomNav = document.querySelector('#bottom-nav');
+const navItems = document.querySelectorAll('.bnav-item');
+const guestbook = document.querySelector('#guestbook');
 
 window.addEventListener('scroll', () => {
+    const guestbookTop = guestbook.getBoundingClientRect().top;
     const screenHeight = window.innerHeight;
 
-    const closingTop = closing?.getBoundingClientRect().top ?? Infinity;
-    const footerTop = footer?.getBoundingClientRect().top ?? Infinity;
-
-    // kalau masuk closing ATAU footer
-    if (
-        closingTop < screenHeight - 100 ||
-        footerTop < screenHeight - 100
-    ) {
-        nav.classList.add('hide-on-end');
-    } else {
-        nav.classList.remove('hide-on-end');
+    // 🚫 kalau sudah masuk guestbook → stop semua animasi nav
+    if (guestbookTop < screenHeight * 0.5) {
+        navItems.forEach(item => item.classList.remove('active'));
+        bottomNav.classList.add('nav-lock'); // kunci state
+        return;
     }
-});
 
+    // ✅ normal behavior (sebelum guestbook)
+    bottomNav.classList.remove('nav-lock');
+
+    document.querySelectorAll('section').forEach(section => {
+        const top = section.offsetTop - 100;
+        const bottom = top + section.offsetHeight;
+        const scroll = window.scrollY;
+
+        if (scroll >= top && scroll < bottom) {
+            navItems.forEach(item => item.classList.remove('active'));
+            const active = document.querySelector(`.bnav-item[href="#${section.id}"]`);
+            if (active) active.classList.add('active');
+        }
+    });
+});
 
