@@ -411,6 +411,10 @@ function initNav() {
 
     window.addEventListener("scroll", checkNav);
     checkNav(); // jalankan sekali saat load
+
+    window.addEventListener("load", () => {
+        window.scrollTo(0, 0);
+    });
 }
 
 function setBnav(el) {
@@ -485,4 +489,6 @@ window.addEventListener('scroll', () => {
         }
     });
 });
+
+
 
