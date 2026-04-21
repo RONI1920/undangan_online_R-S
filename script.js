@@ -453,4 +453,26 @@ function initAll() {
     initNav();
     initBnavScroll(); // ← tambah ini
 }
+//  footer nav
+const nav = document.querySelector('nav');
+const closing = document.querySelector('#closing');
+const footer = document.querySelector('.footer-dev');
+
+window.addEventListener('scroll', () => {
+    const screenHeight = window.innerHeight;
+
+    const closingTop = closing?.getBoundingClientRect().top ?? Infinity;
+    const footerTop = footer?.getBoundingClientRect().top ?? Infinity;
+
+    // kalau masuk closing ATAU footer
+    if (
+        closingTop < screenHeight - 100 ||
+        footerTop < screenHeight - 100
+    ) {
+        nav.classList.add('hide-on-end');
+    } else {
+        nav.classList.remove('hide-on-end');
+    }
+});
+
 
