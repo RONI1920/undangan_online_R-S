@@ -21,14 +21,17 @@ document.addEventListener("DOMContentLoaded", () => {
 // ── PERSONAL LINK ─────────────────────────────────────
 function initGuestName() {
     const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get("to") || urlParams.get("nama");
+    const guestParam = urlParams.get("to") || urlParams.get("nama") || guestName;
 
-    const finalName = name
-        ? `Bapak/Ibu/Saudara/i ${decodeURIComponent(name)}`
-        : "Bapak/Ibu/Saudara/i";
+    guestName = decodeURIComponent(guestParam)
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 
     const guestEl = document.getElementById("guest-name");
-    if (guestEl) guestEl.textContent = finalName;
+    const qrGuestEl = document.getElementById("qr-guest-display");
+
+    if (guestEl) guestEl.textContent = guestName;
+    if (qrGuestEl) qrGuestEl.textContent = guestName;
 }
 
 // ── PARTICLES ────────────────────────────────────────
