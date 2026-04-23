@@ -2,7 +2,7 @@
 
 // mulai dari si Admin
 
-const BASE_URL = "https://roni1920.github.io/undangan_online_R-S/";
+const BASE_URL = "https://invitationonline.my.id/";
 
 const SUPABASE_URL = "https://cykktrwcbtkcbvgqshiw.supabase.co";
 const SUPABASE_KEY_GB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5a2t0cndjYnRrY2J2Z3FzaGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODE0NTMsImV4cCI6MjA5MjI1NzQ1M30.ejk0OoR3_fTKF8Lyn86sxklmWyoRkDdGfqP84LUrjwA";
