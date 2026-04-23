@@ -491,4 +491,19 @@ window.addEventListener('scroll', () => {
 });
 
 
+// Salin No Rekening Bang
+function copyText(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
 
+    const text = el.innerText;
+
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        btn.innerText = "Tersalin ✓";
+
+        setTimeout(() => {
+            btn.innerText = "Salin";
+        }, 2000);
+    });
+}
