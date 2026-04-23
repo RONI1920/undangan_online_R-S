@@ -17,9 +17,21 @@ ${nama}
 
 Assalamu’alaikum Warahmatullahi Wabarakatuh
 
-Dengan memohon rahmat dan ridha Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara Resepsi Pernikahan kami.
+Dengan memohon rahmat dan ridha Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara Resepsi Pernikahan kami:
 
-Informasi lengkap:
+Nama:
+Rudi Putra & Sri Alva Harional S.Pd
+
+Tanggal:
+2 Mei 2026
+
+Waktu:
+10:00 - s/d
+
+Tempat:
+Mempelai Laki-laki
+
+Untuk informasi detail lokasi, rundown acara, dan undangan digital, silakan klik link berikut:
 ${link}
 
 Wassalamu’alaikum Warahmatullahi Wabarakatuh
@@ -57,17 +69,14 @@ async function saveBulk() {
 
 // load
 async function loadGuests() {
-    const { data, error } = await sb.from("tamu").insert([{
-        nama,
-        link,
-        wa_text: wa
-    }]);
+    const { data, error } = await sb
+        .from("tamu")
+        .select("*")
+        .order("created_at", { ascending: false });
 
     if (error) {
-        console.error("DETAIL ERROR:", JSON.stringify(error, null, 2));
-        console.error("CODE:", error.code);
-        console.error("MESSAGE:", error.message);
-        console.error("HINT:", error.hint);
+        console.error(error);
+        return;
     }
 
     const container = document.getElementById("guestList");
@@ -75,7 +84,7 @@ async function loadGuests() {
     container.innerHTML = data.map(g => `
         <div style="padding:10px;border-bottom:1px solid #333">
             <b>${g.nama}</b><br>
-            <button onclick="generateSingle('${g.nama}')">
+            <button onclick="generateSingle(${JSON.stringify(g.nama)})">
                 Generate WA
             </button>
         </div>
@@ -99,35 +108,49 @@ function generateSingle(nama) {
 // generate save
 async function generateAll() {
     const raw = document.getElementById("listNama").value;
+
+    if (!raw.trim()) {
+        alert("Isi dulu nama!");
+        return;
+    }
+
     const list = raw.split("\n").map(n => n.trim()).filter(Boolean);
 
     const output = document.getElementById("output");
     output.innerHTML = "";
 
+    let html = "";
+
     for (const nama of list) {
+
         const link = `${BASE_URL}?to=${encodeURIComponent(nama)}`;
         const wa = generateTemplate(nama, link);
 
-        const { error } = await sb.from("tamu").insert([{
+        await sb.from("tamu").insert([{
             nama,
             link,
             wa_text: wa
         }]);
 
-        if (error) {
-            console.error("DB ERROR:", error);
-            continue;
-        }
+        html += `
+<div class="item">
+    <div class="item-title">${nama}</div>
 
-        output.innerHTML += `
-        <div class="item">
-            <div class="item-title">${nama}</div>
-            <input value="${link}" readonly>
-            <textarea>${wa}</textarea>
-        </div>`;
+    <input value="${link}" readonly>
+    <button onclick="navigator.clipboard.writeText('${link}')">
+        📋 Salin Link
+    </button>
+
+    <textarea>${wa}</textarea>
+
+    <button onclick="generateSingle('${nama}')">
+        📤 Kirim WA
+    </button>
+</div>`;
     }
-}
 
+    output.innerHTML = html;
+}
 
 // load
 async function loadDatabase() {
@@ -206,21 +229,50 @@ function salinTeks(id, btn) {
 }
 
 
+
 async function testKoneksi() {
     console.log("Testing koneksi Supabase...");
     console.log("URL:", SUPABASE_URL);
-    console.log("KEY:", SUPABASE_KEY.substring(0, 20) + "...");
+    console.log("KEY:", SUPABASE_KEY_GB.substring(0, 20) + "...");
 
-    try {
-        const { data, error } = await sb.from("tamu").select("count");
-        if (error) {
-            console.error("❌ Koneksi gagal:", error.message);
-        } else {
-            console.log("✅ Koneksi berhasil:", data);
-        }
-    } catch (e) {
-        console.error("❌ Exception:", e.message);
+    const { data, error } = await sb.from("tamu").select("*").limit(1);
+
+    if (error) {
+        console.error("❌ Koneksi gagal:", error.message);
+    } else {
+        console.log("✅ OK:", data);
     }
 }
 
 testKoneksi(); // panggil langsung
+
+
+function getNamaTamu() {
+    const url = window.location.href;
+
+    // ambil parameter ?to=Nama
+    const match = url.match(/[?&]to=([^&]+)/);
+    if (match) {
+        return decodeURIComponent(match[1]);
+    }
+
+    return "Bapak/Ibu/Saudara/i";
+}
+
+// jalankan setelah halaman siap
+document.addEventListener("DOMContentLoaded", function () {
+    const nama = getNamaTamu();
+
+    const el = document.getElementById("guest-name");
+    if (el) {
+        el.textContent = nama;
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Admin siap");
+});
+
+window.onerror = function (msg, url, line) {
+    alert(`Error: ${msg} di ${line}`);
+};
