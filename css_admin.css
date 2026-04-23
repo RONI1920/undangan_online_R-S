@@ -136,3 +136,20 @@ font-size: 11px;
 }
 
 }
+
+/* ════════════════════════════════════════
+FOOTER
+════════════════════════════════════════ */
+footer { background-color:#111; color:#fff; padding:20px 10px; font-family:'Segoe UI',sans-serif; text-align:center; }
+.social-row { display:flex; justify-content:center; gap:12px; margin-bottom:15px; }
+.social-btn { display:flex; align-items:center; justify-content:center; width:35px; height:35px; background-color:#fff; border-radius:50%; transition:transform 0.3s ease, background-color 0.3s ease; }
+.social-btn svg { width:18px; height:18px; fill:#111; }
+.social-btn:hover { transform:translateY(-4px) scale(1.05); background-color:#e8e8e8; }
+.social-btn[title="GitHub"]:hover svg  { fill:#333; }
+.social-btn[title="Email"]:hover svg   { fill:#ea4335; }
+.social-btn[title="Website"]:hover svg { fill:#4285f4; }
+.social-btn[title="WhatsApp"]:hover svg{ fill:#25d366; }
+.nav-row { display:none; }
+.copyright { font-size:12px; color:#777; margin:0; }
+.copyright span { color:#fff; font-weight:600; }
+.footer-ampersand { margin:0 6px; }
