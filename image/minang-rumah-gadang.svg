@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" preserveAspectRatio="xMidYMax meet">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b0a11"/><stop offset="1" stop-color="#1c0509"/></linearGradient></defs>
+<g fill="url(#g)">
+<path d="M60 276 Q215 266 250 34 Q272 205 360 214 Q462 207 490 34 Q512 205 600 214 Q708 207 730 34 Q752 205 840 214 Q948 207 970 34 Q992 205 1140 276 Z"/>
+<path d="M118 276 H1082 L1058 346 H142 Z"/>
+<path d="M165 346h14v34h-14zM285 346h14v34h-14zM405 346h14v34h-14zM525 346h14v34h-14zM661 346h14v34h-14zM781 346h14v34h-14zM901 346h14v34h-14zM1021 346h14v34h-14zM556 346h88l18 34h-124z"/>
+</g>
+<g fill="#E3B866" opacity=".5"><rect x="218" y="294" width="16" height="34" rx="2"/><rect x="338" y="294" width="16" height="34" rx="2"/><rect x="458" y="294" width="16" height="34" rx="2"/><rect x="726" y="294" width="16" height="34" rx="2"/><rect x="846" y="294" width="16" height="34" rx="2"/><rect x="966" y="294" width="16" height="34" rx="2"/></g>
+</svg>

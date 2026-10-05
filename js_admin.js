@@ -1,17 +1,60 @@
+/* ════════════════════════════════════════
+   Admin undangan — wajib login (Supabase Auth)
+   Pastikan RLS sudah aktif: lihat README.md
+════════════════════════════════════════ */
+(() => {
+    'use strict';
 
+    const BASE_URL = 'https://invitationonline.my.id/';
+    const SUPABASE_URL = 'https://cykktrwcbtkcbvgqshiw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5a2t0cndjYnRrY2J2Z3FzaGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODE0NTMsImV4cCI6MjA5MjI1NzQ1M30.ejk0OoR3_fTKF8Lyn86sxklmWyoRkDdGfqP84LUrjwA';
 
-// mulai dari si Admin
+    const $ = (id) => document.getElementById(id);
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const BASE_URL = "https://invitationonline.my.id/";
+    let guests = [];
 
-const SUPABASE_URL = "https://cykktrwcbtkcbvgqshiw.supabase.co";
-const SUPABASE_KEY_GB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5a2t0cndjYnRrY2J2Z3FzaGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODE0NTMsImV4cCI6MjA5MjI1NzQ1M30.ejk0OoR3_fTKF8Lyn86sxklmWyoRkDdGfqP84LUrjwA";
+    // ── UI helper ───────────────────────────────────────
+    let toastTimer;
+    function toast(msg, isError = false) {
+        const el = $('toast');
+        el.textContent = msg;
+        el.classList.toggle('error', isError);
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY_GB);
+    function setMsg(id, text, type) {
+        const el = $(id);
+        el.textContent = text || '';
+        el.className = 'msg' + (type ? ' ' + type : '');
+    }
 
+    async function copyText(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (e) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+            ta.remove();
+            return ok;
+        }
+    }
 
-function generateTemplate(nama, link) {
-    return `Kepada Yth.
+    // ── Template pesan WhatsApp ─────────────────────────
+    function buildLink(nama) {
+        return `${BASE_URL}?to=${encodeURIComponent(nama)}`;
+    }
+
+    function buildMessage(nama, link) {
+        return `Kepada Yth.
 Bapak/Ibu/Saudara/i
 ${nama}
 
@@ -38,241 +81,183 @@ Wassalamu’alaikum Warahmatullahi Wabarakatuh
 
 Hormat kami,
 Keluarga Besar Kedua Mempelai`;
-}
-
-// save
-
-async function saveBulk() {
-    const text = document.getElementById("bulkNama").value;
-
-    if (!text.trim()) {
-        alert("Isi dulu nama tamu");
-        return;
     }
 
-    const list = text.split("\n").map(n => n.trim()).filter(Boolean);
-
-    const data = list.map(nama => ({ nama }));
-
-    const { error } = await sb.from("tamu").insert(data);
-
-    if (error) {
-        console.error("INSERT ERROR:", error);
-        alert("Gagal simpan data");
-        return;
+    // ── Auth ────────────────────────────────────────────
+    function showView(loggedIn) {
+        $('login-view').hidden = loggedIn;
+        $('app-view').hidden = !loggedIn;
+        if (loggedIn) loadGuests(); else $('email').focus();
     }
 
-    alert("Berhasil simpan semua tamu!");
-    document.getElementById("bulkNama").value = "";
-    loadGuests();
-}
-
-// load
-async function loadGuests() {
-    const { data, error } = await sb
-        .from("tamu")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        return;
+    async function initAuth() {
+        const { data } = await sb.auth.getSession();
+        showView(!!data.session);
+        sb.auth.onAuthStateChange((_event, session) => showView(!!session));
     }
 
-    const container = document.getElementById("guestList");
+    $('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = $('email').value.trim();
+        const password = $('password').value;
+        if (!email || !password) { setMsg('login-msg', 'Email dan kata sandi wajib diisi.', 'error'); return; }
+        const btn = $('login-btn');
+        btn.disabled = true;
+        setMsg('login-msg', '');
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        btn.disabled = false;
+        if (error) {
+            setMsg('login-msg', 'Email atau kata sandi salah.', 'error');
+            return;
+        }
+        $('password').value = '';
+    });
 
-    container.innerHTML = data.map(g => `
-        <div style="padding:10px;border-bottom:1px solid #333">
-            <b>${g.nama}</b><br>
-            <button onclick="generateSingle(${JSON.stringify(g.nama)})">
-                Generate WA
-            </button>
-        </div>
-    `).join("");
-}
+    $('logout-btn').addEventListener('click', async () => {
+        await sb.auth.signOut();
+        guests = [];
+    });
 
-// generate
-
-function generateSingle(nama) {
-    const link = `${BASE_URL}?to=${encodeURIComponent(nama)}`;
-
-    const waText = generateTemplate(nama, link);
-
-    window.open(
-        `https://wa.me/?text=${encodeURIComponent(waText)}`,
-        "_blank"
-    );
-}
-
-
-// generate save
-async function generateAll() {
-    const raw = document.getElementById("listNama").value;
-
-    if (!raw.trim()) {
-        alert("Isi dulu nama!");
-        return;
+    // ── Data tamu ───────────────────────────────────────
+    async function loadGuests() {
+        const list = $('list');
+        list.innerHTML = '<div class="empty">Memuat…</div>';
+        const { data, error } = await sb.from('tamu').select('*').order('created_at', { ascending: false });
+        if (error) {
+            console.error(error);
+            list.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = 'empty';
+            div.textContent = 'Gagal memuat data. Pastikan akun ini punya akses (lihat README.md).';
+            list.appendChild(div);
+            return;
+        }
+        guests = data || [];
+        render();
     }
 
-    const list = raw.split("\n").map(n => n.trim()).filter(Boolean);
+    function render() {
+        const q = $('search').value.trim().toLowerCase();
+        const shown = guests.filter((g) => !q || (g.nama || '').toLowerCase().includes(q));
+        $('count').textContent = guests.length;
 
-    const output = document.getElementById("output");
-    output.innerHTML = "";
+        const list = $('list');
+        list.replaceChildren();
+        if (!shown.length) {
+            const div = document.createElement('div');
+            div.className = 'empty';
+            div.textContent = guests.length ? 'Tidak ada tamu yang cocok.' : 'Belum ada tamu. Tambahkan di atas.';
+            list.appendChild(div);
+            return;
+        }
 
-    let html = "";
+        shown.forEach((g) => {
+            const link = g.link || buildLink(g.nama);
+            const item = document.createElement('div');
+            item.className = 'item';
 
-    for (const nama of list) {
+            const title = document.createElement('div');
+            title.className = 'item-title';
+            title.textContent = g.nama;
 
-        const link = `${BASE_URL}?to=${encodeURIComponent(nama)}`;
-        const wa = generateTemplate(nama, link);
+            const small = document.createElement('small');
+            small.textContent = g.created_at ? new Date(g.created_at).toLocaleString('id-ID') : '';
 
-        await sb.from("tamu").insert([{
-            nama,
-            link,
-            wa_text: wa
-        }]);
+            const linkEl = document.createElement('div');
+            linkEl.className = 'item-link';
+            linkEl.textContent = link;
 
-        html += `
-<div class="item">
-    <div class="item-title">${nama}</div>
+            const actions = document.createElement('div');
+            actions.className = 'item-actions';
+            actions.append(
+                makeBtn('📋 Salin Link', async () => toast(await copyText(link) ? 'Link disalin ✓' : 'Gagal menyalin', false)),
+                makeBtn('📋 Salin Pesan', async () => toast(await copyText(g.wa_text || buildMessage(g.nama, link)) ? 'Pesan disalin ✓' : 'Gagal menyalin', false)),
+                makeBtn('📤 Kirim WA', () => {
+                    const text = g.wa_text || buildMessage(g.nama, link);
+                    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+                }),
+                makeBtn('🗑 Hapus', () => deleteGuest(g), 'danger')
+            );
 
-    <input value="${link}" readonly>
-    <button onclick="navigator.clipboard.writeText('${link}')">
-        📋 Salin Link
-    </button>
-
-    <textarea>${wa}</textarea>
-
-    <button onclick="generateSingle('${nama}')">
-        📤 Kirim WA
-    </button>
-</div>`;
-    }
-
-    output.innerHTML = html;
-}
-
-// load
-async function loadDatabase() {
-    const container = document.getElementById("db-output");
-    container.innerHTML = "Loading...";
-
-    const { data, error } = await sb
-        .from("tamu")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        container.innerHTML = "Gagal load data ❌";
-        console.error(error);
-        return;
-    }
-
-    if (!data.length) {
-        container.innerHTML = "Belum ada tamu.";
-        return;
-    }
-
-    container.innerHTML = data.map(t => `
-        <div class="item">
-            <div class="item-title">${t.nama}</div>
-            <small>${new Date(t.created_at).toLocaleString()}</small>
-
-            <input id="link-${t.id}" value="${t.link}" readonly>
-            <button onclick="salinTeks('link-${t.id}', this)">
-                📋 Salin Link
-            </button>
-
-            <textarea id="wa-${t.id}">${t.wa_text}</textarea>
-            <button onclick="salinTeks('wa-${t.id}', this)">
-                📋 Salin Pesan WA
-            </button>
-        </div>
-    `).join("");
-}
-
-function salinTeks(id, btn) {
-    const el = document.getElementById(id);
-    const teks = el.value;
-
-    navigator.clipboard.writeText(teks)
-        .then(() => {
-            const original = btn.textContent;
-            btn.textContent = "✅ Tersalin!";
-            setTimeout(() => btn.textContent = original, 2000);
-        })
-        .catch(() => {
-            el.select();
-            document.execCommand("copy");
-            const original = btn.textContent;
-            btn.textContent = "✅ Tersalin!";
-            setTimeout(() => btn.textContent = original, 2000);
+            item.append(title, small, linkEl, actions);
+            list.appendChild(item);
         });
-}
-// fungsi salin
-function salinTeks(id, btn) {
-    const teks = document.getElementById(id).value;
+    }
 
-    navigator.clipboard.writeText(teks)
-        .then(() => {
-            btn.textContent = "✅ Tersalin!";
-            setTimeout(() => btn.textContent = "📋 Salin Pesan WA", 2000);
-        })
-        .catch(() => {
-            // fallback untuk browser lama
-            const el = document.getElementById(id);
-            el.select();
-            document.execCommand("copy");
-            btn.textContent = "✅ Tersalin!";
-            setTimeout(() => btn.textContent = "📋 Salin Pesan WA", 2000);
+    function makeBtn(label, onClick, extra) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn small' + (extra ? ' ' + extra : '');
+        b.textContent = label;
+        b.addEventListener('click', onClick);
+        return b;
+    }
+
+    async function deleteGuest(g) {
+        if (!confirm(`Hapus "${g.nama}" dari daftar tamu?`)) return;
+        const { error } = await sb.from('tamu').delete().eq('id', g.id);
+        if (error) { console.error(error); toast('Gagal menghapus (cek izin DELETE di Supabase)', true); return; }
+        guests = guests.filter((x) => x.id !== g.id);
+        render();
+        toast('Tamu dihapus');
+    }
+
+    // ── Tambah tamu (tanpa duplikat) ────────────────────
+    $('add-btn').addEventListener('click', async () => {
+        const names = $('listNama').value.split('\n').map((n) => n.replace(/\s+/g, ' ').trim()).filter(Boolean);
+        if (!names.length) { setMsg('add-msg', 'Isi dulu minimal satu nama tamu.', 'error'); return; }
+
+        const existing = new Set(guests.map((g) => (g.nama || '').toLowerCase()));
+        const seen = new Set();
+        const fresh = [];
+        let skipped = 0;
+        names.forEach((nama) => {
+            const key = nama.toLowerCase();
+            if (existing.has(key) || seen.has(key)) { skipped++; return; }
+            seen.add(key);
+            const link = buildLink(nama);
+            fresh.push({ nama, link, wa_text: buildMessage(nama, link) });
         });
-}
 
+        if (!fresh.length) { setMsg('add-msg', 'Semua nama sudah ada di daftar.', 'error'); return; }
 
+        const btn = $('add-btn');
+        btn.disabled = true;
+        setMsg('add-msg', 'Menyimpan…');
+        const { error } = await sb.from('tamu').insert(fresh);
+        btn.disabled = false;
+        if (error) {
+            console.error(error);
+            setMsg('add-msg', 'Gagal menyimpan. Pastikan sudah masuk dan izin INSERT aktif (lihat README.md).', 'error');
+            return;
+        }
+        $('listNama').value = '';
+        setMsg('add-msg', `${fresh.length} tamu disimpan${skipped ? `, ${skipped} nama duplikat dilewati` : ''}.`, 'ok');
+        await loadGuests();
+    });
 
-async function testKoneksi() {
-    console.log("Testing koneksi Supabase...");
-    console.log("URL:", SUPABASE_URL);
-    console.log("KEY:", SUPABASE_KEY_GB.substring(0, 20) + "...");
+    // ── Salin semua / CSV ───────────────────────────────
+    $('copy-all').addEventListener('click', async () => {
+        if (!guests.length) { toast('Belum ada tamu', true); return; }
+        const text = guests.map((g) => g.wa_text || buildMessage(g.nama, g.link || buildLink(g.nama)))
+            .join('\n\n————————————————\n\n');
+        toast(await copyText(text) ? `${guests.length} pesan disalin ✓` : 'Gagal menyalin', false);
+    });
 
-    const { data, error } = await sb.from("tamu").select("*").limit(1);
+    $('export-csv').addEventListener('click', () => {
+        if (!guests.length) { toast('Belum ada tamu', true); return; }
+        const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const rows = [['Nama', 'Link', 'Dibuat'], ...guests.map((g) => [g.nama, g.link || buildLink(g.nama), g.created_at])];
+        const csv = '﻿' + rows.map((r) => r.map(esc).join(',')).join('\n');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        a.download = 'daftar-tamu.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
 
-    if (error) {
-        console.error("❌ Koneksi gagal:", error.message);
-    } else {
-        console.log("✅ OK:", data);
-    }
-}
+    $('reload').addEventListener('click', loadGuests);
+    $('search').addEventListener('input', render);
 
-testKoneksi(); // panggil langsung
-
-
-function getNamaTamu() {
-    const url = window.location.href;
-
-    // ambil parameter ?to=Nama
-    const match = url.match(/[?&]to=([^&]+)/);
-    if (match) {
-        return decodeURIComponent(match[1]);
-    }
-
-    return "Bapak/Ibu/Saudara/i";
-}
-
-// jalankan setelah halaman siap
-document.addEventListener("DOMContentLoaded", function () {
-    const nama = getNamaTamu();
-
-    const el = document.getElementById("guest-name");
-    if (el) {
-        el.textContent = nama;
-    }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("Admin siap");
-});
-
-window.onerror = function (msg, url, line) {
-    alert(`Error: ${msg} di ${line}`);
-};
+    initAuth();
+})();
