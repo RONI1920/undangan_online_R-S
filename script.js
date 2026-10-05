@@ -1,9 +1,9 @@
 // ── CONFIG ──────────────────────────────────────────
 const CONFIG = {
-    bride: "Rudi Putra",
-    groom: "Fulan",
+    bride: "Anisa Khairoza",
+    groom: "Rido Fernando",
     eventName: "Pernikahan",
-    eventDate: new Date("2026-05-02T00:00:00")
+    eventDate: new Date("2027-01-09T14:00:00+07:00")
 };
 
 // ── GLOBAL STATE ─────────────────────────────────────
@@ -425,7 +425,7 @@ function setBnav(el) {
 
 // Auto-highlight saat scroll
 function initBnavScroll() {
-    const sections = ['hero', 'countdown', 'events', 'rsvp', 'guestbook'];
+    const sections = ['hero', 'story', 'countdown', 'events', 'rsvp', 'guestbook'];
     const items = document.querySelectorAll('.bnav-item');
 
     window.addEventListener('scroll', () => {
