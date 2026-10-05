@@ -17,19 +17,19 @@ ${nama}
 
 Assalamu’alaikum Warahmatullahi Wabarakatuh
 
-Dengan memohon rahmat dan ridha Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara Resepsi Pernikahan kami:
+Dengan memohon rahmat dan ridha Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara Pernikahan kami:
 
 Nama:
-Rudi Putra & Sri Alva Harional S.Pd
+Anisa Khairoza, S.AP. & Rido Fernando, ATT IV
 
-Tanggal:
-2 Mei 2026
+Akad Nikah:
+Sabtu, 9 Januari 2027, 14.00 WIB s/d selesai
 
-Waktu:
-10:00 - s/d
+Resepsi:
+Minggu, 10 Januari 2027, 10.00 WIB s/d selesai
 
 Tempat:
-Mempelai Laki-laki
+Jln. Pemancungan No. 13 RT 002 RW 006 Kel. Pasa Gadang, Kec. Padang Selatan, Kota Padang
 
 Untuk informasi detail lokasi, rundown acara, dan undangan digital, silakan klik link berikut:
 ${link}
