@@ -49,11 +49,22 @@
         toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
     }
 
+    const statusTimers = {};
+
     function setStatus(id, message, type) {
         const el = $(id);
         if (!el) return;
+        clearTimeout(statusTimers[id]);
         el.textContent = message || '';
         el.className = 'form-status' + (type ? ' ' + type : '');
+
+        // Pesan sukses & error hilang otomatis setelah 5 detik
+        if (message) {
+            statusTimers[id] = setTimeout(() => {
+                el.textContent = '';
+                el.className = 'form-status';
+            }, 5000);
+        }
     }
 
     function lastSubmitOk(key) {
@@ -364,7 +375,8 @@
 
         const text = document.createElement('p');
         text.className = 'gb-text';
-        text.textContent = item.pesan || '';
+        const isi = (item.pesan || '').trim().replace(/^["“”'‘’]+|["“”'‘’]+$/g, '').trim();
+        text.textContent = isi ? `“ ${isi} ”` : '';
 
         const star = document.createElement('div');
         star.className = 'gb-star';
