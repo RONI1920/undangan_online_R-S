@@ -75,3 +75,7 @@ create policy "rsvp insert only" on public.rsvp
   (nama file sama) bila ada.
 - Ubah tanggal/hitung mundur di `script.js` → `CONFIG.eventDate` dan `CONFIG.eventEnd`.
 - Tautan "Simpan ke Kalender" memakai perkiraan durasi (Akad 14.00–17.00, Resepsi 10.00–14.00 WIB). Ubah di `index.html` bila perlu.
+
+## Menu Kehadiran di Admin
+
+RSVP kini memakai project yang sama dengan tamu (`cykktrwcbtkcbvgqshiw`). Jalankan SQL di bawah pada project tersebut.

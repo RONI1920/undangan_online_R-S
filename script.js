@@ -13,8 +13,8 @@
         defaultGuest: 'Tamu Undangan',
         // Kunci "anon" Supabase memang publik. Keamanannya ditentukan oleh Row Level Security (lihat README.md).
         rsvp: {
-            url: 'https://nkbqjdmiwmfbejbqsdyl.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rYnFqZG1pd21mYmVqYnFzZHlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMTAxMzUsImV4cCI6MjA5MTU4NjEzNX0.-58DEvE2wD3Y1NJbqIBI0qjCZ51gKRZpcemkkvevrgo'
+            url: 'https://cykktrwcbtkcbvgqshiw.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5a2t0cndjYnRrY2J2Z3FzaGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODE0NTMsImV4cCI6MjA5MjI1NzQ1M30.ejk0OoR3_fTKF8Lyn86sxklmWyoRkDdGfqP84LUrjwA'
         },
         guestbook: {
             url: 'https://cykktrwcbtkcbvgqshiw.supabase.co',
@@ -124,6 +124,88 @@
         container.appendChild(frag);
     }
 
+    // ── BARA EMAS DI HERO ───────────────────────────────
+    function initEmbers() {
+        const hero = $('hero');
+        if (!hero || reduceMotion || hero.querySelector('.ember')) return;
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < 16; i++) {
+            const e = document.createElement('span');
+            e.className = 'ember';
+            e.setAttribute('aria-hidden', 'true');
+            const size = 2 + Math.random() * 3;
+            e.style.cssText = `--x:${(Math.random() * 100).toFixed(1)}%;--s:${size.toFixed(1)}px;` +
+                `--dur:${(7 + Math.random() * 7).toFixed(1)}s;--delay:${(Math.random() * 8).toFixed(1)}s;` +
+                `--drift:${(Math.random() * 80 - 40).toFixed(0)}px;`;
+            frag.appendChild(e);
+        }
+        hero.appendChild(frag);
+    }
+
+    // ── DEKORASI ────────────────────────────────────────
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+
+    // Bintang berkelap-kelip (pengganti lampion)
+    function starsHTML(n) {
+        let out = '';
+        for (let i = 0; i < n; i++) {
+            out += `<span class="star" style="--x:${rnd(0, 100).toFixed(1)}%;--y:${rnd(0, 100).toFixed(1)}%;` +
+                `--size:${rnd(1, 3.2).toFixed(1)}px;--d:${rnd(2, 5).toFixed(1)}s;--delay:${rnd(0, 6).toFixed(1)}s;` +
+                `--peak:${rnd(0.5, 1).toFixed(2)}"></span>`;
+        }
+        return out;
+    }
+
+    function sparklesHTML(n) {
+        let out = '';
+        for (let i = 0; i < n; i++) {
+            out += `<span class="sparkle" style="--x:${rnd(4, 96).toFixed(1)}%;--y:${rnd(6, 94).toFixed(1)}%;` +
+                `--fs:${rnd(9, 15).toFixed(0)}px;--d:${rnd(2.5, 5).toFixed(1)}s;--delay:${rnd(0, 5).toFixed(1)}s">✦</span>`;
+        }
+        return out;
+    }
+
+    function heartsHTML(n) {
+        let out = '';
+        for (let i = 0; i < n; i++) {
+            out += `<span class="deco-heart" style="--x:${rnd(5, 95).toFixed(1)}%;--fs:${rnd(10, 18).toFixed(0)}px;` +
+                `--dur:${rnd(12, 18).toFixed(1)}s;--delay:${rnd(0, 10).toFixed(1)}s;--drift:${rnd(-40, 40).toFixed(0)}px;">♥</span>`;
+        }
+        return out;
+    }
+
+    function birdsHTML() {
+        const bird = '<svg class="bird" viewBox="0 0 24 12" aria-hidden="true"><path d="M0 4Q6-1 12 6Q18-1 24 4Q17 3 12 9Q7 3 0 4Z"/></svg>';
+        return `<span class="bird-wrap" style="--y:12%;--dur:30s;--delay:0s">${bird}</span>` +
+            `<span class="bird-wrap" style="--y:26%;--dur:40s;--delay:-14s">${bird}</span>`;
+    }
+
+    const cornersHTML = () =>
+        '<span class="corner tl"></span><span class="corner tr"></span>' +
+        '<span class="corner bl"></span><span class="corner br"></span>';
+
+    const orbitHTML = (soft) =>
+        `<div class="orbit${soft ? ' soft' : ''}" aria-hidden="true"><span class="orbit-ring"><i></i></span></div>`;
+
+    function addDecor(id, html) {
+        const sec = $(id);
+        if (!sec || !html) return;
+        sec.insertAdjacentHTML('beforeend', `<div class="deco-layer" aria-hidden="true">${html}</div>`);
+    }
+
+    function initDecor() {
+        if (reduceMotion) return;
+        addDecor('cover', starsHTML(40));
+        addDecor('hero', starsHTML(60));
+        addDecor('story', heartsHTML(6));
+        addDecor('countdown', orbitHTML(false));
+        addDecor('events', cornersHTML() + sparklesHTML(4));
+        addDecor('rsvp', cornersHTML() + birdsHTML());
+        addDecor('guestbook', cornersHTML() + sparklesHTML(6));
+        addDecor('amplop', cornersHTML() + sparklesHTML(8));
+        addDecor('closing', cornersHTML() + orbitHTML(true) + sparklesHTML(10));
+    }
+
     // ── MUSIK ───────────────────────────────────────────
     const music = { el: null, btn: null, on: false, resumeAfterHide: false };
 
@@ -180,6 +262,7 @@
         playMusic(); // dipicu klik pengguna => diizinkan browser
         initCountdown();
         initReveal();
+        initEmbers();
         initNav();
         loadGuestbook();
     }
@@ -205,7 +288,14 @@
             const h = Math.floor((diff % 86400000) / 3600000);
             const m = Math.floor((diff % 3600000) / 60000);
             const s = Math.floor((diff % 60000) / 1000);
-            [d, h, m, s].forEach((v, i) => { ids[i].textContent = pad(v); });
+            [d, h, m, s].forEach((v, i) => {
+                const next = pad(v);
+                if (ids[i].textContent === next) return;
+                ids[i].textContent = next;
+                ids[i].classList.remove('bump');
+                void ids[i].offsetWidth; // mulai ulang animasi
+                ids[i].classList.add('bump');
+            });
         }
         tick();
         const timer = setInterval(() => { if (!document.hidden) tick(); }, 1000);
@@ -293,15 +383,17 @@
         $('rsvp-name').addEventListener('input', () => fieldError('rsvp-name', ''));
         $('rsvp-phone').addEventListener('input', () => fieldError('rsvp-phone', ''));
 
-        $('rsvp-again').addEventListener('click', () => {
-            success.hidden = true;
-            form.hidden = false;
-            form.reset();
-            countGroup.hidden = false;
-            if (hasPersonalGuest) $('rsvp-name').value = '';
-            setStatus('rsvp-status', '');
-            $('rsvp-name').focus();
-        });
+        // Satu perangkat hanya boleh mengisi sekali
+        const againBtn = $('rsvp-again');
+        if (againBtn) againBtn.hidden = true;
+        function lockRsvp(hadir, note) {
+            $('rsvp-success-note').textContent = note || RSVP_NOTES[hadir] || RSVP_NOTES.hadir;
+            form.hidden = true;
+            success.hidden = false;
+        }
+        let done = null;
+        try { done = localStorage.getItem('rsvp_done'); } catch (e) { /* abaikan */ }
+        if (done) lockRsvp(done, 'Konfirmasi Anda sudah kami terima. Terima kasih! 🤍');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -338,9 +430,17 @@
                     kehadiran: hadir,
                     jumlah_tamu: jumlah
                 }]);
-                if (error) throw error;
+                if (error) {
+                    if (error.code === '23505') {
+                        try { localStorage.setItem('rsvp_done', hadir); } catch (e3) { /* abaikan */ }
+                        lockRsvp(hadir, 'Nama ini sudah pernah mengisi konfirmasi. Terima kasih! 🤍');
+                        return;
+                    }
+                    throw error;
+                }
 
                 markSubmit('rsvp_last');
+                try { localStorage.setItem('rsvp_done', hadir); } catch (e2) { /* abaikan */ }
                 $('rsvp-success-note').textContent = RSVP_NOTES[hadir] || RSVP_NOTES.hadir;
                 form.hidden = true;
                 success.hidden = false;
@@ -537,6 +637,7 @@
 
     // ── INIT ────────────────────────────────────────────
     function init() {
+        initDecor();
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
 

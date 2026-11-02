@@ -12,6 +12,7 @@
     const $ = (id) => document.getElementById(id);
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+
     let guests = [];
 
     // ── UI helper ───────────────────────────────────────
@@ -258,6 +259,121 @@ Keluarga Besar Kedua Mempelai`;
 
     $('reload').addEventListener('click', loadGuests);
     $('search').addEventListener('input', render);
+
+    // ── Tab ─────────────────────────────────────────────
+    document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('active', x === t));
+        $('tab-guests').hidden = t.dataset.tab !== 'guests';
+        $('tab-rsvp').hidden = t.dataset.tab !== 'rsvp';
+        if (t.dataset.tab === 'rsvp' && !rsvps.length) loadRsvp();
+    }));
+
+    // ── Kehadiran (RSVP) ────────────────────────────────
+    let rsvps = [];
+    let rsvpFilter = 'all';
+    const STATUS = { hadir: ['Hadir', 'ok'], tidak: ['Tidak hadir', 'no'], mungkin: ['Mungkin', 'maybe'] };
+
+    function rsvpMsg(text) {
+        const list = $('rsvp-list');
+        const div = document.createElement('div');
+        div.className = 'empty';
+        div.textContent = text;
+        list.replaceChildren(div);
+    }
+
+    async function loadRsvp() {
+        rsvpMsg('Memuat…');
+        const { data, error } = await sb.from('rsvp').select('*').order('created_at', { ascending: false });
+        if (error) { console.error(error); rsvpMsg('Gagal memuat. Pastikan policy SELECT untuk authenticated sudah dibuat (lihat README.md).'); return; }
+        rsvps = data || [];
+        renderRsvp();
+    }
+
+    function renderRsvp() {
+        const by = (k) => rsvps.filter((r) => r.kehadiran === k);
+        $('st-hadir').textContent = by('hadir').length;
+        $('st-tidak').textContent = by('tidak').length;
+        $('st-mungkin').textContent = by('mungkin').length;
+        $('st-orang').textContent = by('hadir').reduce((n, r) => n + (r.jumlah_tamu || 1), 0);
+
+        const q = $('rsvp-search').value.trim().toLowerCase();
+        const shown = rsvps.filter((r) => (rsvpFilter === 'all' || r.kehadiran === rsvpFilter) && (!q || (r.nama || '').toLowerCase().includes(q)));
+        $('rsvp-count').textContent = shown.length;
+        if (!shown.length) { rsvpMsg(rsvps.length ? 'Tidak ada data yang cocok.' : 'Belum ada konfirmasi masuk.'); return; }
+
+        const frag = document.createDocumentFragment();
+        shown.forEach((r) => {
+            const [label, cls] = STATUS[r.kehadiran] || [r.kehadiran, 'maybe'];
+            const row = document.createElement('div');
+            row.className = 'item rsvp-item ' + cls;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar ' + cls;
+            avatar.textContent = (r.nama || '?').trim().charAt(0).toUpperCase();
+
+            const info = document.createElement('div');
+            info.className = 'rsvp-info';
+            const name = document.createElement('div');
+            name.className = 'item-title';
+            name.textContent = r.nama;
+            const meta = document.createElement('small');
+            const parts = [];
+            if (r.kehadiran === 'hadir') parts.push(`${r.jumlah_tamu || 1} orang`);
+            if (r.created_at) parts.push(new Date(r.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }));
+            meta.textContent = parts.join(' • ');
+            info.append(name, meta);
+
+            const side = document.createElement('div');
+            side.className = 'rsvp-side';
+            const badge = document.createElement('span');
+            badge.className = 'badge ' + cls;
+            badge.textContent = label;
+            side.append(badge);
+            if (r.no_hp) {
+                let d = String(r.no_hp).replace(/\D/g, '');
+                if (d.startsWith('0')) d = '62' + d.slice(1);
+                const wa = document.createElement('a');
+                wa.className = 'wa';
+                wa.href = `https://wa.me/${d}`;
+                wa.target = '_blank';
+                wa.rel = 'noopener';
+                wa.textContent = '💬 WA';
+                side.append(wa);
+            }
+            row.append(avatar, info, side);
+            frag.appendChild(row);
+        });
+        $('rsvp-list').replaceChildren(frag);
+    }
+
+    $('rsvp-filter').addEventListener('click', (e) => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        rsvpFilter = b.dataset.f;
+        $('rsvp-filter').querySelectorAll('button').forEach((x) => x.classList.toggle('active', x === b));
+        renderRsvp();
+    });
+    $('rsvp-search').addEventListener('input', renderRsvp);
+    $('rsvp-reload').addEventListener('click', loadRsvp);
+    $('rsvp-csv').addEventListener('click', () => {
+        if (!rsvps.length) { toast('Belum ada data', true); return; }
+        const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const rows = [['Nama', 'No HP', 'Kehadiran', 'Jumlah', 'Waktu'], ...rsvps.map((r) => [r.nama, r.no_hp, r.kehadiran, r.jumlah_tamu, r.created_at])];
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.map((r) => r.map(esc).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }));
+        a.download = 'daftar-kehadiran.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+
+    // Keluar otomatis bila tidak aktif 15 menit
+    let idleTimer;
+    function resetIdle() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(async () => { await sb.auth.signOut(); guests = []; rsvps = []; }, 15 * 60 * 1000);
+    }
+    ['click', 'keydown', 'touchstart', 'scroll'].forEach((ev) => document.addEventListener(ev, resetIdle, { passive: true }));
+    resetIdle();
 
     initAuth();
 })();
